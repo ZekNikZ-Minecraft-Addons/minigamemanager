@@ -40,7 +40,7 @@ repositories {
 }
 
 task hello {
-    println project.findProperty("gpr.username")
+    println project.findProperty("gpr.username2") ?: System.getenv("GITHUB_ACTOR") ?: "hi"
 }
 
 dependencies {
