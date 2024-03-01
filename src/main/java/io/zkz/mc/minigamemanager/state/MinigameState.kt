@@ -3,9 +3,9 @@ package io.zkz.mc.minigamemanager.state
 import io.zkz.mc.gametools.injection.InjectionComponent
 import io.zkz.mc.gametools.injection.inject
 import io.zkz.mc.minigamemanager.minigame.MinigameService
-import io.zkz.mc.minigamemanager.task.MinigameTask
 import io.zkz.mc.minigamemanager.scoreboard.EmptyMinigameScoreboard
 import io.zkz.mc.minigamemanager.scoreboard.MinigameScoreboard
+import io.zkz.mc.minigamemanager.task.MinigameTask
 import org.bukkit.entity.Player
 
 open class MinigameState(
@@ -16,7 +16,7 @@ open class MinigameState(
     var parentState: MinigameState? = null
         internal set
     val id: String
-        get() = "${if (parentState != null) "${parentState!!.id}/" else ""}${stateId}"
+        get() = "${if (parentState != null) "${parentState!!.id}/" else ""}$stateId"
 
     /**
      * Initialize this state after it is registered.
@@ -61,7 +61,6 @@ open class MinigameState(
     open fun buildScoreboard(): MinigameScoreboard = EmptyMinigameScoreboard
 
     protected fun addTask(delay: Long, task: () -> Unit) {
-
         addTask(MinigameTask.from(delay, null, task))
     }
 

@@ -24,7 +24,6 @@ abstract class MinigameTask(
                 override fun run() {
                     task()
                 }
-
             }
         }
     }

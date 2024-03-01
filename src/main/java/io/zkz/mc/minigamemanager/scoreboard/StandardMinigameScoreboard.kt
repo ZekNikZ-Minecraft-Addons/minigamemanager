@@ -19,7 +19,6 @@ import io.zkz.mc.minigamemanager.state.MinigameState
 import io.zkz.mc.minigamemanager.state.impl.ReadyUpMinigameState
 import org.bukkit.entity.Player
 
-
 object StandardMinigameScoreboard : MinigameScoreboard, InjectionComponent {
     private val minigameService by inject<MinigameService>()
     private val teamService by inject<TeamService>()
@@ -45,11 +44,11 @@ object StandardMinigameScoreboard : MinigameScoreboard, InjectionComponent {
                         ComponentEntry(
                             mm(
                                 "<legacy_aqua><bold>Game ${
-                                    minigameService.config.currentGameNumber
+                                minigameService.config.currentGameNumber
                                 }/${
-                                    minigameService.config.maxGameNumber
+                                minigameService.config.maxGameNumber
                                 }:</bold></legacy_aqua> ${
-                                    minigameService.config.minigameName
+                                minigameService.config.minigameName
                                 }",
                             ),
                         ),
@@ -60,9 +59,9 @@ object StandardMinigameScoreboard : MinigameScoreboard, InjectionComponent {
                         ComponentEntry(
                             mm(
                                 "<legacy_aqua><bold>Game ${
-                                    minigameService.config.currentGameNumber
+                                minigameService.config.currentGameNumber
                                 }:</bold></legacy_aqua> ${
-                                    minigameService.config.minigameName
+                                minigameService.config.minigameName
                                 }",
                             ),
                         ),
@@ -80,7 +79,7 @@ object StandardMinigameScoreboard : MinigameScoreboard, InjectionComponent {
                     KEY_READY_PLAYER_COUNT,
                     ValueEntry(
                         "<legacy_green><bold>Ready players:</bold></legacy_green> <value>/${
-                            minigameService.participantsAndGameMasters.size
+                        minigameService.participantsAndGameMasters.size
                         }",
                         0,
                     ),
@@ -132,7 +131,7 @@ object StandardMinigameScoreboard : MinigameScoreboard, InjectionComponent {
         // Game status
         if (state is IHasStateInfo) {
             scoreboard.addSpace()
-            scoreboard.addEntry(mm("<legacy_red><bold>Game status:"));
+            scoreboard.addEntry(mm("<legacy_red><bold>Game status:"))
             scoreboard.addEntry(mm(state.currentGameStatus))
         }
     }
@@ -156,9 +155,9 @@ object StandardMinigameScoreboard : MinigameScoreboard, InjectionComponent {
         }
     }
 
-    fun addTeamScores(scoreboard: GameScoreboard, team: GameTeam) {
-        scoreboard.addSpace();
-        scoreboard.addEntry("teamScores", TeamScoresScoreboardEntry(team));
+    fun addTeamScores(scoreboard: GameScoreboard, team: GameTeam?) {
+        scoreboard.addSpace()
+        scoreboard.addEntry("teamScores", TeamScoresScoreboardEntry(team))
     }
 
     fun addPlayerScores(scoreboard: GameScoreboard, player: Player) {

@@ -21,7 +21,6 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.player.PlayerJoinEvent
 import java.util.*
 
-
 @Injectable
 class MinigameService(
     plugin: MinigameManagerPlugin,
@@ -110,7 +109,6 @@ class MinigameService(
     internal fun removeRunningTask(task: MinigameTask) {
         runningTasks.remove(task)
     }
-
 
     var globalTimer: AbstractTimer? = null
         private set
