@@ -34,13 +34,9 @@ repositories {
         url = "https://maven.pkg.github.com/ZekNikZ-Minecraft-Addons/gametools"
         credentials {
             username = project.findProperty("gpr.username") ?: System.getenv("GITHUB_ACTOR")
-            password = project.findProperty("gpr.access_token") ?: System.getenv("GITHUB_ACCESS_TOKEN")
+            password = project.findProperty("gpr.access_token") ?: System.getenv("GITHUB_TOKEN")
         }
     }
-}
-
-task hello {
-    println project.findProperty("gpr.username2") ?: System.getenv("GITHUB_ACTOR") ?: "hi"
 }
 
 dependencies {
