@@ -39,6 +39,10 @@ repositories {
     }
 }
 
+task hello {
+    println project.findProperty("gpr.username")
+}
+
 dependencies {
     compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}"
     compileOnly "org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}"
