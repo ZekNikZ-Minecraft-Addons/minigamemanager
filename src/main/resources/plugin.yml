@@ -1,0 +1,7 @@
+name: '${name}'
+version: '${version}'
+main: io.zkz.mc.minigamemanager.MinigameManagerPlugin
+api-version: '${apiVersion}'
+authors: [ZekNikZ]
+depend:
+  - gametools
