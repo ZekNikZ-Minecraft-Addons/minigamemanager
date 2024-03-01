@@ -1,6 +1,5 @@
 package io.zkz.mc.minigamemanager.state.impl
 
-import io.zkz.mc.minigamemanager.state.DelegatedMinigameState
 import io.zkz.mc.minigamemanager.state.IHasStateInfo
 
 class BasicMinigameState(

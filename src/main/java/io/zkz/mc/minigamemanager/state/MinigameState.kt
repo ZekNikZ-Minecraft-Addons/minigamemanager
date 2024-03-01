@@ -1,10 +1,18 @@
 package io.zkz.mc.minigamemanager.state
 
+import io.zkz.mc.gametools.injection.InjectionComponent
+import io.zkz.mc.gametools.injection.inject
+import io.zkz.mc.minigamemanager.minigame.MinigameService
+import io.zkz.mc.minigamemanager.task.MinigameTask
+import io.zkz.mc.minigamemanager.scoreboard.EmptyMinigameScoreboard
+import io.zkz.mc.minigamemanager.scoreboard.MinigameScoreboard
 import org.bukkit.entity.Player
 
 open class MinigameState(
     private val stateId: String,
-) {
+) : InjectionComponent {
+    private val minigameService by inject<MinigameService>()
+
     var parentState: MinigameState? = null
         internal set
     val id: String
@@ -46,6 +54,24 @@ open class MinigameState(
      * Called when a player dies while this state is active.
      */
     open fun onPlayerDeath(player: Player) = Unit
+
+    /**
+     * Build the minigame scoreboard for this state.
+     */
+    open fun buildScoreboard(): MinigameScoreboard = EmptyMinigameScoreboard
+
+    protected fun addTask(delay: Long, task: () -> Unit) {
+
+        addTask(MinigameTask.from(delay, null, task))
+    }
+
+    protected fun addTask(delay: Long, period: Long, task: () -> Unit) {
+        addTask(MinigameTask.from(delay, period, task))
+    }
+
+    protected fun addTask(task: MinigameTask) {
+        minigameService.registerTask(task)
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

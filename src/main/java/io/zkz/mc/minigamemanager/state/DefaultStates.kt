@@ -5,6 +5,8 @@ import io.zkz.mc.gametools.injection.InjectionComponent
 import io.zkz.mc.gametools.injection.inject
 import io.zkz.mc.minigamemanager.minigame.MinigameService
 import io.zkz.mc.minigamemanager.state.impl.BasicMinigameState
+import io.zkz.mc.minigamemanager.state.impl.DelegatedMinigameState
+import io.zkz.mc.minigamemanager.state.impl.ReadyUpMinigameState
 
 @Injectable
 object DefaultStates : InjectionComponent {
@@ -16,7 +18,7 @@ object DefaultStates : InjectionComponent {
 
     val WAITING_FOR_PLAYERS = minigameService.registerState(MinigameState("waiting_for_players"))
     val RULES = minigameService.registerState(MinigameState("rules"))
-    val WAITING_TO_BEGIN = minigameService.registerState(MinigameState("waiting_to_begin"))
+    val WAITING_TO_BEGIN = minigameService.registerState(ReadyUpMinigameState({ PRE_GAME }, "waiting_to_begin"))
 
     val PRE_GAME = minigameService.registerState(DelegatedMinigameState("pre_game"))
     val POST_GAME = minigameService.registerState(DelegatedMinigameState("post_game"))

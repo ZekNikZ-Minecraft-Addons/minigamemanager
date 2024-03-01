@@ -1,5 +1,6 @@
-package io.zkz.mc.minigamemanager.state
+package io.zkz.mc.minigamemanager.state.impl
 
+import io.zkz.mc.minigamemanager.state.MinigameState
 import org.bukkit.entity.Player
 
 open class DelegatedMinigameState(
