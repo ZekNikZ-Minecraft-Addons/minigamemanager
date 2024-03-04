@@ -3,8 +3,8 @@ package io.zkz.mc.minigamemanager.state
 import io.zkz.mc.gametools.injection.InjectionComponent
 import io.zkz.mc.gametools.injection.inject
 import io.zkz.mc.minigamemanager.minigame.MinigameService
-import io.zkz.mc.minigamemanager.scoreboard.EmptyMinigameScoreboard
 import io.zkz.mc.minigamemanager.scoreboard.MinigameScoreboard
+import io.zkz.mc.minigamemanager.scoreboard.StandardMinigameScoreboard
 import io.zkz.mc.minigamemanager.task.MinigameTask
 import org.bukkit.entity.Player
 
@@ -58,7 +58,7 @@ open class MinigameState(
     /**
      * Build the minigame scoreboard for this state.
      */
-    open fun buildScoreboard(): MinigameScoreboard = EmptyMinigameScoreboard
+    open fun buildScoreboard(): MinigameScoreboard = StandardMinigameScoreboard
 
     protected fun addTask(delay: Long, task: () -> Unit) {
         addTask(MinigameTask.from(delay, null, task))

@@ -29,20 +29,20 @@ class TeamScoresScoreboardEntry(
             mm("<legacy_aqua><bold>Game Points:</bold></legacy_aqua> (<legacy_yellow>${scoreService.currentScoreMultiplier}x</legacy_yellow>)"),
         )
 
-        // Get team placements
+        // Get score entries
         val entries = scoreService
             .query().forAllTeams().inGame().get()
             .entries
             .sortedWith(compareBy({ -it.value }, { it.key }))
-        var placement = 0
+        if (entries.isEmpty()) {
+            return
+        }
+
+        // Get team placement
+        var placement = -1
         val totalNumTeams = entries.size
         if (team != null) {
-            for (i in 0 until totalNumTeams) {
-                if (entries[i].key == team.id) {
-                    placement = i
-                    break
-                }
-            }
+            placement = entries.indexOfFirst { it.key == team.id }
         }
 
         // Determine which teams to display

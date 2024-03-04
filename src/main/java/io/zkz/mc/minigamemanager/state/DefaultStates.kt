@@ -12,14 +12,23 @@ import io.zkz.mc.minigamemanager.state.impl.ReadyUpMinigameState
 object DefaultStates : InjectionComponent {
     private val minigameService by inject<MinigameService>()
 
-    val SERVER_STARTING = minigameService.registerState(BasicMinigameState("server_starting", "Server starting..."))
-    val LOADING = minigameService.registerState(BasicMinigameState("loading", "Loading..."))
-    val SETUP = minigameService.registerState(DelegatedMinigameState("setup"))
+    private val ALL = mutableListOf<MinigameState>()
+    private fun <T : MinigameState> register(state: T): T {
+        ALL.add(state)
+        return state
+    }
 
-    val WAITING_FOR_PLAYERS = minigameService.registerState(MinigameState("waiting_for_players"))
-    val RULES = minigameService.registerState(MinigameState("rules"))
-    val WAITING_TO_BEGIN = minigameService.registerState(ReadyUpMinigameState({ PRE_GAME }, "waiting_to_begin"))
+    val SERVER_STARTING = register(BasicMinigameState("server_starting", "Server starting..."))
+    val SETUP = register(DelegatedMinigameState.WithStateInfo("setup", "Server loading..."))
 
-    val PRE_GAME = minigameService.registerState(DelegatedMinigameState("pre_game"))
-    val POST_GAME = minigameService.registerState(DelegatedMinigameState("post_game"))
+    val WAITING_FOR_PLAYERS = register(MinigameState("waiting_for_players"))
+    val RULES = register(MinigameState("rules"))
+    val WAITING_TO_BEGIN = register(ReadyUpMinigameState({ PRE_GAME }, "waiting_to_begin"))
+
+    val PRE_GAME = register(DelegatedMinigameState("pre_game"))
+    val POST_GAME = register(DelegatedMinigameState("post_game"))
+
+    fun init() {
+        ALL.forEach(minigameService::registerState)
+    }
 }

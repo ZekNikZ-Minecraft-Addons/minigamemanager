@@ -85,7 +85,7 @@ object StandardMinigameScoreboard : MinigameScoreboard, InjectionComponent {
                     ),
                 )
             }
-            if (state != DefaultStates.SERVER_STARTING && state != DefaultStates.LOADING && state != DefaultStates.WAITING_FOR_PLAYERS && state != DefaultStates.RULES && state != DefaultStates.WAITING_TO_BEGIN) {
+            if (state != DefaultStates.SERVER_STARTING && state != DefaultStates.SETUP && state != DefaultStates.WAITING_FOR_PLAYERS && state != DefaultStates.RULES && state != DefaultStates.WAITING_TO_BEGIN) {
                 addGlobalMinigameTimer(scoreboard)
                 addTeamScores(scoreboard, team)
             }

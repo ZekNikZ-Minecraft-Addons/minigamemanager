@@ -1,5 +1,6 @@
 package io.zkz.mc.minigamemanager.state.impl
 
+import io.zkz.mc.minigamemanager.state.IHasStateInfo
 import io.zkz.mc.minigamemanager.state.MinigameState
 import org.bukkit.entity.Player
 
@@ -31,4 +32,9 @@ open class DelegatedMinigameState(
     override fun onPlayerDeath(player: Player) {
         onPlayerDeathDelegates.forEach { it(player) }
     }
+
+    class WithStateInfo(
+        stateId: String,
+        override val currentGameStatus: String,
+    ) : DelegatedMinigameState(stateId), IHasStateInfo
 }

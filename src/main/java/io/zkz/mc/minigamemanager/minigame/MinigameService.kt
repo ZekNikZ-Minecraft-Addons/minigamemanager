@@ -47,12 +47,14 @@ class MinigameService(
     }
 
     fun setState(state: MinigameState) {
+        logger.info("Attempting state transition: ${currentState.id} => ${state.id}")
         val oldState = currentState
         val newState = states[state.id] ?: throw IllegalStateException("State with id '${state.id}' is not registered")
         val preEvent = StateChangeEvent.Pre(oldState, newState)
         event(preEvent)
 
         if (preEvent.isCancelled) {
+            logger.info("Attempting state transition cancelled.")
             return
         }
 
@@ -70,6 +72,8 @@ class MinigameService(
     }
 
     override fun onEnable() {
+        DefaultStates.init()
+
         runNextTick {
             setState(DefaultStates.SETUP)
         }
