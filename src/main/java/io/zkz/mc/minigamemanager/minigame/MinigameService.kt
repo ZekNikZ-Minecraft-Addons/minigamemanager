@@ -3,23 +3,31 @@ package io.zkz.mc.minigamemanager.minigame
 import io.zkz.mc.gametools.event.event
 import io.zkz.mc.gametools.injection.Injectable
 import io.zkz.mc.gametools.scoreboard.ScoreboardService
+import io.zkz.mc.gametools.scoreboard.entry.ValueEntry
 import io.zkz.mc.gametools.service.PluginService
-import io.zkz.mc.gametools.teams.DefaultTeams
-import io.zkz.mc.gametools.teams.GameTeam
-import io.zkz.mc.gametools.teams.TeamService
+import io.zkz.mc.gametools.team.DefaultTeams
+import io.zkz.mc.gametools.team.GameTeam
+import io.zkz.mc.gametools.team.TeamService
 import io.zkz.mc.gametools.timer.AbstractTimer
+import io.zkz.mc.gametools.timer.GameCountdownTimer
 import io.zkz.mc.gametools.util.BukkitUtils.forEachPlayer
 import io.zkz.mc.gametools.util.BukkitUtils.runNextTick
+import io.zkz.mc.gametools.util.PlayerUtils.allOnline
+import io.zkz.mc.gametools.util.PlayerUtils.filterOnline
+import io.zkz.mc.gametools.util.mm
 import io.zkz.mc.minigamemanager.MinigameManagerPlugin
 import io.zkz.mc.minigamemanager.event.StateChangeEvent
 import io.zkz.mc.minigamemanager.state.DefaultStates
 import io.zkz.mc.minigamemanager.state.MinigameState
 import io.zkz.mc.minigamemanager.task.MinigameTask
+import io.zkz.mc.minigamemanager.task.RulesTask
+import io.zkz.mc.minigamemanager.task.ScoreSummaryTask
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.player.PlayerJoinEvent
 import java.util.*
+import kotlin.time.DurationUnit
 
 @Injectable
 class MinigameService(
@@ -74,7 +82,40 @@ class MinigameService(
     override fun onEnable() {
         DefaultStates.init()
 
+        // Setup WAITING_FOR_PLAYERS
+        DefaultStates.WAITING_FOR_PLAYERS.handleEnter {
+            addTask(1, 20, ::waitForPlayers)
+        }
+
+        // Setup RULES
+        DefaultStates.RULES.handleEnter {
+            addTask(RulesTask())
+        }
+
+        // Setup POST_GAME
+        DefaultStates.POST_GAME.handleEnter {
+            setGlobalTimer(
+                GameCountdownTimer(
+                    plugin,
+                    20,
+                    config.postGameDelayInTicks * 50L + ScoreSummaryTask.SECONDS_PER_SLIDE * ScoreSummaryTask.NUM_SLIDES * 20L,
+                    DurationUnit.MILLISECONDS,
+                ) {
+                    setState(DefaultStates.GAME_OVER)
+                },
+                mm("Back to hub in:"),
+            )
+
+            addTask(ScoreSummaryTask())
+        }
+
+        // Transition to next state
         runNextTick {
+            // Make sure this happens last
+            DefaultStates.SETUP.handleEnter {
+                setState(DefaultStates.WAITING_FOR_PLAYERS)
+            }
+
             setState(DefaultStates.SETUP)
         }
     }
@@ -135,6 +176,20 @@ class MinigameService(
         scoreboard.init(currentState)
         forEachPlayer { scoreboard.apply(it, teamService.getTeamOfPlayer(it)) }
         scoreboard.cleanup()
+    }
+
+    private fun waitForPlayers() {
+        // Update scoreboards
+        val numReadyParticipants = participants.filterOnline().count()
+        scoreboardService.allScoreboards.forEach { scoreboard ->
+            val entry = scoreboard.getEntry<ValueEntry<Int>>("playerCount")
+            entry?.value = numReadyParticipants
+        }
+
+        // Check if we should move on
+        if (config.shouldAutomaticallyShowRules && participants.allOnline()) {
+            setState(DefaultStates.RULES)
+        }
     }
 
     @EventHandler

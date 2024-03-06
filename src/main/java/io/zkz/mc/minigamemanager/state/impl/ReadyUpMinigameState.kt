@@ -27,13 +27,10 @@ class ReadyUpMinigameState(
         minigameService.setState(nextState())
     }
 
-    @Suppress("UNCHECKED_CAST")
     private fun onPlayerReady(player: Player, session: ReadyUpSession) {
         scoreboardService.allScoreboards.forEach { scoreboard ->
-            val entry = scoreboard.getEntry(StandardMinigameScoreboard.KEY_READY_PLAYER_COUNT)
-            if (entry is ValueEntry<*>) {
-                (entry as ValueEntry<Int>).value = session.readyPlayerCount.toInt()
-            }
+            val entry: ValueEntry<Int>? = scoreboard.getEntry(StandardMinigameScoreboard.KEY_READY_PLAYER_COUNT)
+            entry?.value = session.readyPlayerCount.toInt()
         }
     }
 }

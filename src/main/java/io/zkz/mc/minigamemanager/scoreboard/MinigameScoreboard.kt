@@ -1,6 +1,6 @@
 package io.zkz.mc.minigamemanager.scoreboard
 
-import io.zkz.mc.gametools.teams.GameTeam
+import io.zkz.mc.gametools.team.GameTeam
 import io.zkz.mc.minigamemanager.state.MinigameState
 import org.bukkit.entity.Player
 

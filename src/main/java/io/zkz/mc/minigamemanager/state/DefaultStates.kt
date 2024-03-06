@@ -18,15 +18,17 @@ object DefaultStates : InjectionComponent {
         return state
     }
 
-    val SERVER_STARTING = register(BasicMinigameState("server_starting", "Server starting..."))
-    val SETUP = register(DelegatedMinigameState.WithStateInfo("setup", "Server loading..."))
+    val SERVER_STARTING = register(BasicMinigameState("server_starting", "Server starting"))
+    val SETUP = register(BasicMinigameState("setup", "Server loading"))
 
-    val WAITING_FOR_PLAYERS = register(MinigameState("waiting_for_players"))
-    val RULES = register(MinigameState("rules"))
+    val WAITING_FOR_PLAYERS = register(BasicMinigameState("waiting_for_players", "Waiting for players"))
+    val RULES = register(BasicMinigameState("rules", "Showing rules"))
     val WAITING_TO_BEGIN = register(ReadyUpMinigameState({ PRE_GAME }, "waiting_to_begin"))
 
     val PRE_GAME = register(DelegatedMinigameState("pre_game"))
     val POST_GAME = register(DelegatedMinigameState("post_game"))
+
+    val GAME_OVER = register(DelegatedMinigameState("game_over"))
 
     fun init() {
         ALL.forEach(minigameService::registerState)

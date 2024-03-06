@@ -7,8 +7,8 @@ import io.zkz.mc.gametools.scoreboard.ScoreboardService
 import io.zkz.mc.gametools.scoreboard.entry.ComponentEntry
 import io.zkz.mc.gametools.scoreboard.entry.TimerEntry
 import io.zkz.mc.gametools.scoreboard.entry.ValueEntry
-import io.zkz.mc.gametools.teams.GameTeam
-import io.zkz.mc.gametools.teams.TeamService
+import io.zkz.mc.gametools.team.GameTeam
+import io.zkz.mc.gametools.team.TeamService
 import io.zkz.mc.gametools.util.mm
 import io.zkz.mc.minigamemanager.minigame.MinigameService
 import io.zkz.mc.minigamemanager.state.DefaultStates

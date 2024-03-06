@@ -18,6 +18,9 @@ open class MinigameState(
     val id: String
         get() = "${if (parentState != null) "${parentState!!.id}/" else ""}$stateId"
 
+    val isActive
+        get() = minigameService.currentState.id.startsWith(id)
+
     /**
      * Initialize this state after it is registered.
      */
@@ -60,15 +63,27 @@ open class MinigameState(
      */
     open fun buildScoreboard(): MinigameScoreboard = StandardMinigameScoreboard
 
-    protected fun addTask(delay: Long, task: () -> Unit) {
+    fun addTask(delay: Long, task: () -> Unit) {
+        if (!isActive) {
+            throw IllegalStateException("You can only add tasks while the state is active")
+        }
+
         addTask(MinigameTask.from(delay, null, task))
     }
 
-    protected fun addTask(delay: Long, period: Long, task: () -> Unit) {
+    fun addTask(delay: Long, period: Long, task: () -> Unit) {
+        if (!isActive) {
+            throw IllegalStateException("You can only add tasks while the state is active")
+        }
+
         addTask(MinigameTask.from(delay, period, task))
     }
 
-    protected fun addTask(task: MinigameTask) {
+    fun addTask(task: MinigameTask) {
+        if (!isActive) {
+            throw IllegalStateException("You can only add tasks while the state is active")
+        }
+
         minigameService.registerTask(task)
     }
 

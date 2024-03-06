@@ -4,8 +4,8 @@ import io.zkz.mc.gametools.injection.InjectionComponent
 import io.zkz.mc.gametools.injection.inject
 import io.zkz.mc.gametools.score.ScoreService
 import io.zkz.mc.gametools.scoreboard.entry.ScoreboardEntry
-import io.zkz.mc.gametools.teams.GameTeam
-import io.zkz.mc.gametools.teams.TeamService
+import io.zkz.mc.gametools.team.GameTeam
+import io.zkz.mc.gametools.team.TeamService
 import io.zkz.mc.gametools.util.ChatType
 import io.zkz.mc.gametools.util.mm
 import io.zkz.mc.gametools.util.observable.IObservable
