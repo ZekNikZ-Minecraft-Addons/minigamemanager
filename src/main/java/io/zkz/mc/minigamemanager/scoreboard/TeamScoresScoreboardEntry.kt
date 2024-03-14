@@ -8,7 +8,6 @@ import io.zkz.mc.gametools.team.GameTeam
 import io.zkz.mc.gametools.team.TeamService
 import io.zkz.mc.gametools.util.ChatType
 import io.zkz.mc.gametools.util.mm
-import io.zkz.mc.gametools.util.observable.IObservable
 import io.zkz.mc.gametools.util.observable.IObserver
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -77,7 +76,7 @@ class TeamScoresScoreboardEntry(
         scoreService.removeListener(this)
     }
 
-    override fun handleChanged(observable: IObservable<ScoreService>) {
+    override fun handleChanged(observable: ScoreService) {
         markDirty()
     }
 }

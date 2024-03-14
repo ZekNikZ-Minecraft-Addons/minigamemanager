@@ -21,6 +21,9 @@ open class MinigameState(
     val isActive
         get() = minigameService.currentState.id.startsWith(id)
 
+    open val isInGame
+        get() = false
+
     /**
      * Initialize this state after it is registered.
      */
