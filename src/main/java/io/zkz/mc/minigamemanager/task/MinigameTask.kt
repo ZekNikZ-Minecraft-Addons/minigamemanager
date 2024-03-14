@@ -9,7 +9,7 @@ abstract class MinigameTask(
     delay: Long,
     period: Long? = null,
 ) : GameTask(delay, period), InjectionComponent {
-    private val minigameService by inject<MinigameService>()
+    protected val minigameService by inject<MinigameService>()
 
     override fun cancel(removeReference: Boolean) {
         super.cancel(removeReference)

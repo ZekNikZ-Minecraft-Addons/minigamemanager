@@ -49,22 +49,28 @@ open class MinigameState(
     /**
      * Called when a player joins the server while this state is active.
      */
-    open fun onPlayerJoin(player: Player) = Unit
+    open fun onPlayerJoin(player: Player) {
+        parentState?.onPlayerJoin(player)
+    }
 
     /**
      * Called when a player quits the server while this state is active.
      */
-    open fun onPlayerQuit(player: Player) = Unit
+    open fun onPlayerQuit(player: Player) {
+        parentState?.onPlayerQuit(player)
+    }
 
     /**
      * Called when a player dies while this state is active.
      */
-    open fun onPlayerDeath(player: Player) = Unit
+    open fun onPlayerDeath(player: Player) {
+        parentState?.onPlayerDeath(player)
+    }
 
     /**
      * Build the minigame scoreboard for this state.
      */
-    open fun buildScoreboard(): MinigameScoreboard = StandardMinigameScoreboard
+    open fun buildScoreboard(): MinigameScoreboard? = StandardMinigameScoreboard
 
     fun addTask(delay: Long, task: () -> Unit) {
         if (!isActive) {

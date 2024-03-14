@@ -172,7 +172,15 @@ class MinigameService(
     }
 
     fun refreshScoreboards() {
-        val scoreboard = currentState.buildScoreboard()
+        var state = currentState
+        var scoreboard = state.buildScoreboard()
+        while (scoreboard == null) {
+            state = state.parentState ?: break
+            scoreboard = state.buildScoreboard()
+        }
+        if (scoreboard == null) {
+            return
+        }
         scoreboard.init(currentState)
         forEachPlayer { scoreboard.apply(it, teamService.getTeamOfPlayer(it)) }
         scoreboard.cleanup()
