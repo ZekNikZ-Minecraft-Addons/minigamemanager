@@ -1,4 +1,4 @@
-package io.zkz.mc.minigamemanager.state
+package io.zkz.mc.minigamemanager.minigame
 
 import io.zkz.mc.gametools.injection.inject
 import io.zkz.mc.gametools.team.GameTeam

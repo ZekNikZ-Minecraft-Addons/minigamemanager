@@ -3,31 +3,25 @@ package io.zkz.mc.minigamemanager.minigame
 import io.zkz.mc.gametools.event.event
 import io.zkz.mc.gametools.injection.Injectable
 import io.zkz.mc.gametools.scoreboard.ScoreboardService
-import io.zkz.mc.gametools.scoreboard.entry.ValueEntry
 import io.zkz.mc.gametools.service.PluginService
 import io.zkz.mc.gametools.team.DefaultTeams
 import io.zkz.mc.gametools.team.GameTeam
 import io.zkz.mc.gametools.team.TeamService
 import io.zkz.mc.gametools.timer.AbstractTimer
-import io.zkz.mc.gametools.timer.GameCountdownTimer
 import io.zkz.mc.gametools.util.BukkitUtils.forEachPlayer
 import io.zkz.mc.gametools.util.BukkitUtils.runNextTick
-import io.zkz.mc.gametools.util.PlayerUtils.allOnline
-import io.zkz.mc.gametools.util.PlayerUtils.filterOnline
-import io.zkz.mc.gametools.util.mm
 import io.zkz.mc.minigamemanager.MinigameManagerPlugin
+import io.zkz.mc.minigamemanager.event.RoundChangeEvent
 import io.zkz.mc.minigamemanager.event.StateChangeEvent
 import io.zkz.mc.minigamemanager.state.DefaultStates
 import io.zkz.mc.minigamemanager.state.MinigameState
+import io.zkz.mc.minigamemanager.state.impl.DelegatedMinigameState
 import io.zkz.mc.minigamemanager.task.MinigameTask
-import io.zkz.mc.minigamemanager.task.RulesTask
-import io.zkz.mc.minigamemanager.task.ScoreSummaryTask
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.player.PlayerJoinEvent
 import java.util.*
-import kotlin.time.DurationUnit
 
 @Injectable
 class MinigameService(
@@ -35,7 +29,17 @@ class MinigameService(
     private val teamService: TeamService,
     private val scoreboardService: ScoreboardService,
 ) : PluginService<MinigameManagerPlugin>(plugin) {
-    private val states: MutableMap<String, MinigameState> = mutableMapOf()
+    private val states = mutableMapOf<String, MinigameState>()
+    private val rounds = mutableListOf<Round>()
+    var currentRoundIndex = -1
+        private set
+    val currentRound
+        get() = rounds[currentRoundIndex]
+    val numRounds
+        get() = rounds.size
+    val isLastRound
+        get() = currentRoundIndex == rounds.size - 1
+
     var currentState: MinigameState = DefaultStates.SERVER_STARTING
         private set
     var config: MinigameConfig = MinigameConfig.DEFAULT_CONFIG
@@ -54,6 +58,14 @@ class MinigameService(
         return stateBuilder().also { registerState(it) }
     }
 
+    fun registerRound(vararg rounds: Round) {
+        registerRounds(listOf(*rounds))
+    }
+
+    fun registerRounds(rounds: List<Round>) {
+        this.rounds.addAll(rounds)
+    }
+
     fun setState(state: MinigameState) {
         logger.info("Attempting state transition: ${currentState.id} => ${state.id}")
         val oldState = currentState
@@ -62,7 +74,7 @@ class MinigameService(
         event(preEvent)
 
         if (preEvent.isCancelled) {
-            logger.info("Attempting state transition cancelled.")
+            logger.info("State transition cancelled.")
             return
         }
 
@@ -79,44 +91,55 @@ class MinigameService(
         refreshScoreboards()
     }
 
+    fun setRound(roundIndex: Int) {
+        if (roundIndex < 0 || roundIndex >= rounds.size) {
+            throw IllegalArgumentException("Round index $roundIndex out of bounds")
+        }
+
+        logger.info("Attempting round transition: $currentRoundIndex => $roundIndex")
+        val oldRound = rounds[currentRoundIndex]
+        val newRound = rounds[roundIndex]
+        val preEvent = RoundChangeEvent.Pre(oldRound, newRound)
+        event(preEvent)
+
+        if (preEvent.isCancelled) {
+            logger.info("Round transition cancelled.")
+            return
+        }
+
+        if (currentRoundIndex >= 0) {
+            currentRound.onDeselected()
+        }
+        currentRoundIndex = roundIndex
+        currentRound.onSelected()
+
+        event(RoundChangeEvent.Post(oldRound, newRound))
+
+        refreshScoreboards()
+    }
+
+    inline fun <reified T : Round> getCurrentRound(): T {
+        return currentRound as? T ?: throw IllegalStateException("Round is not of type ${T::class.simpleName}")
+    }
+
     override fun onEnable() {
         DefaultStates.init()
 
-        // Setup WAITING_FOR_PLAYERS
-        DefaultStates.WAITING_FOR_PLAYERS.handleEnter {
-            addTask(1, 20, ::waitForPlayers)
-        }
-
-        // Setup RULES
-        DefaultStates.RULES.handleEnter {
-            addTask(RulesTask())
-        }
-
-        // Setup POST_GAME
-        DefaultStates.POST_GAME.handleEnter {
-            setGlobalTimer(
-                GameCountdownTimer(
-                    plugin,
-                    20,
-                    config.postGameDelayInTicks * 50L + ScoreSummaryTask.SECONDS_PER_SLIDE * ScoreSummaryTask.NUM_SLIDES * 20L,
-                    DurationUnit.MILLISECONDS,
-                ) {
-                    setState(DefaultStates.GAME_OVER)
-                },
-                mm("Back to hub in:"),
-            )
-
-            addTask(ScoreSummaryTask())
-        }
-
         // Transition to next state
         runNextTick {
-            // Make sure this happens last
-            DefaultStates.SETUP.handleEnter {
-                setState(DefaultStates.WAITING_FOR_PLAYERS)
-            }
-
             setState(DefaultStates.SETUP)
+
+            setupRoundHandlers()
+        }
+    }
+
+    private fun setupRoundHandlers() {
+        states.forEach {
+            if (it is DelegatedMinigameState) {
+                it.handleEnter {
+                    currentRound.onEnterState(this as DelegatedMinigameState)
+                }
+            }
         }
     }
 
@@ -172,32 +195,10 @@ class MinigameService(
     }
 
     fun refreshScoreboards() {
-        var state = currentState
-        var scoreboard = state.buildScoreboard()
-        while (scoreboard == null) {
-            state = state.parentState ?: break
-            scoreboard = state.buildScoreboard()
-        }
-        if (scoreboard == null) {
-            return
-        }
+        val scoreboard = currentState.buildScoreboard() ?: return
         scoreboard.init(currentState)
         forEachPlayer { scoreboard.apply(it, teamService.getTeamOfPlayer(it)) }
         scoreboard.cleanup()
-    }
-
-    private fun waitForPlayers() {
-        // Update scoreboards
-        val numReadyParticipants = participants.filterOnline().count()
-        scoreboardService.allScoreboards.forEach { scoreboard ->
-            val entry = scoreboard.getEntry<ValueEntry<Int>>("playerCount")
-            entry?.value = numReadyParticipants
-        }
-
-        // Check if we should move on
-        if (config.shouldAutomaticallyShowRules && participants.allOnline()) {
-            setState(DefaultStates.RULES)
-        }
     }
 
     @EventHandler

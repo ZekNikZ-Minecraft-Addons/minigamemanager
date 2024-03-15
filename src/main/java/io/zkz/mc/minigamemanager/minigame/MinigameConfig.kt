@@ -14,10 +14,14 @@ data class MinigameConfig(
     private val tournament: String? = null,
     val currentGameNumber: Int? = null,
     val maxGameNumber: Int? = null,
+    val preRoundDelayInTicks: Int = 200,
+    val postRoundDelayInTicks: Int = 200,
     val postGameDelayInTicks: Int = 200,
     val shouldAutomaticallyShowRules: Boolean = false,
+    val shouldAutomaticallyGoToNextRound: Boolean = true,
     val shouldShowScoreSummary: Boolean = true,
-    val firstGameSpecificState: () -> MinigameState = { DefaultStates.POST_GAME },
+    val shouldReadyUpEachRound: Boolean = false,
+    val firstGameSpecificState: () -> MinigameState = { DefaultStates.IN_GAME },
 ) : InjectionComponent {
     private val constants by inject<GTConstants>()
 

@@ -5,7 +5,8 @@ import org.bukkit.entity.Player
 
 open class DelegatedMinigameState(
     stateId: String,
-) : MinigameState(stateId) {
+    gameStatusString: String? = null,
+) : MinigameState(stateId, gameStatusString) {
     private val onEnterDelegates: MutableList<MinigameState.() -> Unit> = mutableListOf()
     private val onExitDelegates: MutableList<MinigameState.() -> Unit> = mutableListOf()
     private val onPlayerJoinDelegates: MutableList<MinigameState.(player: Player) -> Unit> = mutableListOf()

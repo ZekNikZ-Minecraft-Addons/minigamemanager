@@ -4,22 +4,18 @@ import io.zkz.mc.gametools.injection.InjectionComponent
 import io.zkz.mc.gametools.injection.inject
 import io.zkz.mc.minigamemanager.minigame.MinigameService
 import io.zkz.mc.minigamemanager.scoreboard.MinigameScoreboard
-import io.zkz.mc.minigamemanager.scoreboard.StandardMinigameScoreboard
+import io.zkz.mc.minigamemanager.scoreboard.impl.StandardMinigameScoreboard
 import io.zkz.mc.minigamemanager.task.MinigameTask
 import org.bukkit.entity.Player
 
 open class MinigameState(
-    private val stateId: String,
+    val id: String,
+    val gameStatusString: String? = null,
 ) : InjectionComponent {
-    private val minigameService by inject<MinigameService>()
-
-    var parentState: MinigameState? = null
-        internal set
-    val id: String
-        get() = "${if (parentState != null) "${parentState!!.id}/" else ""}$stateId"
+    protected val minigameService by inject<MinigameService>()
 
     val isActive
-        get() = minigameService.currentState.id.startsWith(id)
+        get() = minigameService.currentState == this
 
     open val isInGame
         get() = false
@@ -49,23 +45,17 @@ open class MinigameState(
     /**
      * Called when a player joins the server while this state is active.
      */
-    open fun onPlayerJoin(player: Player) {
-        parentState?.onPlayerJoin(player)
-    }
+    open fun onPlayerJoin(player: Player) = Unit
 
     /**
      * Called when a player quits the server while this state is active.
      */
-    open fun onPlayerQuit(player: Player) {
-        parentState?.onPlayerQuit(player)
-    }
+    open fun onPlayerQuit(player: Player) = Unit
 
     /**
      * Called when a player dies while this state is active.
      */
-    open fun onPlayerDeath(player: Player) {
-        parentState?.onPlayerDeath(player)
-    }
+    open fun onPlayerDeath(player: Player) = Unit
 
     /**
      * Build the minigame scoreboard for this state.
