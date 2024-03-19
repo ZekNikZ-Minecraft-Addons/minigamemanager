@@ -118,7 +118,7 @@ class MinigameService(
         refreshScoreboards()
     }
 
-    inline fun <reified T : Round> getCurrentRound(): T {
+    inline fun <reified T : Round> getCurrentRoundTyped(): T {
         return currentRound as? T ?: throw IllegalStateException("Round is not of type ${T::class.simpleName}")
     }
 
