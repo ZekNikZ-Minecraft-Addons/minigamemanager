@@ -15,6 +15,7 @@ import io.zkz.mc.minigamemanager.event.RoundChangeEvent
 import io.zkz.mc.minigamemanager.event.StateChangeEvent
 import io.zkz.mc.minigamemanager.state.DefaultStates
 import io.zkz.mc.minigamemanager.state.MinigameState
+import io.zkz.mc.minigamemanager.state.StateRegistry
 import io.zkz.mc.minigamemanager.state.impl.DelegatedMinigameState
 import io.zkz.mc.minigamemanager.task.MinigameTask
 import net.kyori.adventure.text.Component
@@ -123,7 +124,7 @@ class MinigameService(
     }
 
     override fun onEnable() {
-        DefaultStates.init()
+        injectionContainer.getAllOfType<StateRegistry>().forEach(StateRegistry::init)
 
         // Transition to next state
         runNextTick {
