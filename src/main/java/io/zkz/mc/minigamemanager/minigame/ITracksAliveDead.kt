@@ -18,11 +18,11 @@ interface ITracksAliveDead : InjectionComponent {
 
     fun setAlive(playerId: UUID)
 
-    fun setAlive(player: Player)
+    fun setAlive(player: Player): Unit = setAlive(player.uniqueId)
 
     fun setDead(playerId: UUID)
 
-    fun setDead(player: Player)
+    fun setDead(player: Player): Unit = setDead(player.uniqueId)
 
     fun isAlive(playerId: UUID): Boolean = alivePlayers.contains(playerId)
 

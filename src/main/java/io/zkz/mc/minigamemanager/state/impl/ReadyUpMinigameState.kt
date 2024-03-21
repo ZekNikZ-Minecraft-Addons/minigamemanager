@@ -15,7 +15,7 @@ class ReadyUpMinigameState(
     private val nextState: () -> MinigameState,
     stateId: String = "waiting_for_ready",
     private val skipReady: () -> Boolean = { false },
-) : MinigameState(stateId), InjectionComponent {
+) : DelegatedMinigameState(stateId), InjectionComponent {
     private val readyUpService by inject<ReadyUpService>()
     private val scoreboardService by inject<ScoreboardService>()
 

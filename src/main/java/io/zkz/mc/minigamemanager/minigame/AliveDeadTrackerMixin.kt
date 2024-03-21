@@ -3,7 +3,6 @@ package io.zkz.mc.minigamemanager.minigame
 import io.zkz.mc.gametools.injection.inject
 import io.zkz.mc.gametools.team.GameTeam
 import io.zkz.mc.gametools.team.TeamService
-import org.bukkit.entity.Player
 import java.util.*
 
 class AliveDeadTrackerMixin : ITracksAliveDead {
@@ -20,11 +19,7 @@ class AliveDeadTrackerMixin : ITracksAliveDead {
         _alivePlayers.add(playerId)
     }
 
-    override fun setAlive(player: Player) = setAlive(player.uniqueId)
-
     override fun setDead(playerId: UUID) {
         _alivePlayers.remove(playerId)
     }
-
-    override fun setDead(player: Player) = setDead(player.uniqueId)
 }
